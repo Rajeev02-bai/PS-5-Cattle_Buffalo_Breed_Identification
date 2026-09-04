@@ -1,0 +1,11 @@
+streamlit
+torch
+torchvision
+numpy
+Pillow
+timm
+requests
+pandas
+gTTS
+huggingface_hub
+transformers
