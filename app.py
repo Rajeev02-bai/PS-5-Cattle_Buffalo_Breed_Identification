@@ -205,14 +205,23 @@ def set_custom_style():
             background-color: var(--paper);
             background-image: radial-gradient(circle at 1px 1px, rgba(43,36,23,0.07) 1px, transparent 0);
             background-size: 18px 18px;
-        }
-
-        .stApp, .stApp * {
-            font-family: 'IBM Plex Sans', sans-serif;
             color: var(--ink);
         }
 
-        .main .block-container {
+        /* Font only — NOT color. Forcing color on every descendant (including
+           a button's own label span) overrides inheritance and can make a
+           button's text match its own background — e.g. dark text on a dark
+           button, which is exactly what made "Cattle Marketplace" invisible. */
+        .stApp * {
+            font-family: 'IBM Plex Sans', sans-serif;
+        }
+
+        /* Multiple selectors here because Streamlit renames this container's
+           testid across versions — .main .block-container alone can silently
+           match nothing, leaving the whole card unstyled. */
+        .main .block-container,
+        [data-testid="stAppViewBlockContainer"],
+        [data-testid="stMainBlockContainer"] {
             background-color: var(--paper-card);
             border: 2px solid var(--ink);
             border-radius: var(--radius);
@@ -288,7 +297,8 @@ def set_custom_style():
             font-size: 14px;
         }
 
-        /* Buttons */
+        /* Buttons — now safe from the .stApp * color override above, so this
+           color actually reaches the label text instead of being overridden. */
         .stButton > button {
             background-color: var(--ink) !important;
             color: var(--paper) !important;
@@ -303,11 +313,17 @@ def set_custom_style():
             color: var(--paper) !important;
         }
 
-        /* File uploader */
+        /* File uploader dropzone border */
         [data-testid="stFileUploader"] section {
             background-color: var(--paper) !important;
             border: 2px dashed var(--ink) !important;
             border-radius: var(--radius) !important;
+        }
+        /* Only the instruction text color — NOT the browse button itself.
+           Overriding the button's own background/border collided with
+           Streamlit's icon+label markup and caused doubled/overlapping text. */
+        [data-testid="stFileUploaderDropzoneInstructions"] * {
+            color: var(--ink-soft);
         }
 
         /* Alerts */
@@ -321,6 +337,29 @@ def set_custom_style():
         [data-testid="stSidebar"] {
             background-color: var(--paper-deep) !important;
             border-right: 2px solid var(--ink);
+        }
+
+        /* Top header bar — otherwise stays default white and clashes with
+           the paper background above/behind it. */
+        [data-testid="stHeader"] {
+            background-color: var(--paper) !important;
+        }
+        [data-testid="stDecoration"] {
+            display: none;
+        }
+
+        /* Floating chat toggle — without a fixed size it inherits the general
+           button rule and renders as an oversized rectangle instead of a
+           small round icon button. */
+        .chat-toggle-wrap .stButton > button {
+            width: 52px;
+            height: 52px;
+            border-radius: 50% !important;
+            padding: 0 !important;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         </style>
         """,
@@ -752,7 +791,7 @@ elif st.session_state.current_page == "marketplace":
         """, unsafe_allow_html=True)
 
 # ============ CHAT TOGGLE ============
-st.markdown('<div style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">', unsafe_allow_html=True)
+st.markdown('<div class="chat-toggle-wrap" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;">', unsafe_allow_html=True)
 if st.button("💬", key="chat_toggle", help="Chat with us"):
     toggle_chat()
 st.markdown('</div>', unsafe_allow_html=True)
