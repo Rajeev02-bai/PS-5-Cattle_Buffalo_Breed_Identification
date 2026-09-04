@@ -25,7 +25,7 @@ st.set_page_config(page_title="🐄 Cattle Breed Identifier", page_icon="🐄", 
 import streamlit.components.v1 as components
 
 st.set_page_config(
-    page_title = "BBC AI',
+    page_title = "BBC AI",
     page_icon = "🐄",
     layout = "wide",
 )
