@@ -26,7 +26,7 @@ import streamlit.components.v1 as components
 
 st.set_page_config(
     page_title = "BBC AI",
-    page_icon = "🐄",
+    page_icon = "static/icon-192.png",
     layout = "wide",
 )
 
