@@ -15,7 +15,46 @@ from huggingface_hub import hf_hub_download
 import json
 from transformers import BlipProcessor, BlipForConditionalGeneration
 # Set page config first
-st.set_page_config(page_title="🐄 Cattle Breed Identifier", layout="centered", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="🐄 Cattle Breed Identifier", page_icon="🐄", layout="centered", initial_sidebar_state="collapsed")
+# ============ MOBILE HOME-SCREEN ICON (PWA) ============
+# Injects <link>/<meta> tags into the real page <head> (not just the
+# Streamlit iframe body), so mobile browsers offer "Add to Home Screen"
+# with our icon, and tapping that icon opens straight into this app.
+# Requires: static/ folder next to this file + enableStaticServing = true
+# in .streamlit/config.toml (both included in this package).
+import streamlit.components.v1 as components
+
+def inject_pwa_head():
+    components.html(
+        """
+        <script>
+        const headTags = [
+            {tag: "link", rel: "manifest", href: "./app/static/manifest.json"},
+            {tag: "link", rel: "apple-touch-icon", href: "./app/static/apple-touch-icon.png"},
+            {tag: "link", rel: "icon", type: "image/png", sizes: "32x32", href: "./app/static/favicon-32.png"},
+            {tag: "link", rel: "icon", type: "image/png", sizes: "16x16", href: "./app/static/favicon-16.png"},
+            {tag: "link", rel: "shortcut icon", href: "./app/static/favicon.ico"},
+            {tag: "meta", name: "theme-color", content: "#3498db"},
+            {tag: "meta", name: "mobile-web-app-capable", content: "yes"},
+            {tag: "meta", name: "apple-mobile-web-app-capable", content: "yes"},
+            {tag: "meta", name: "apple-mobile-web-app-status-bar-style", content: "black-translucent"},
+            {tag: "meta", name: "apple-mobile-web-app-title", content: "Cattle ID"},
+        ];
+        const parentHead = window.parent.document.head;
+        headTags.forEach(t => {
+            const selector = t.tag + (t.rel ? `[rel="${t.rel}"]` : "") + (t.name ? `[name="${t.name}"]` : "");
+            if (parentHead.querySelector(selector)) return; // avoid duplicates on rerun
+            const el = window.parent.document.createElement(t.tag);
+            Object.keys(t).forEach(k => { if (k !== "tag") el.setAttribute(k, t[k]); });
+            parentHead.appendChild(el);
+        });
+        </script>
+        """,
+        height=0,
+        width=0,
+    )
+
+inject_pwa_head()
 # ============ TRANSLATIONS ============
 def get_translation(key, language="en"):
     translations = {
